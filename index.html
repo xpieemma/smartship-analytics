@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartShip Analytics | Intelligent Freight Audit</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-ship"></i>
+            <span>SmartShip Analytics</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-link"><i class="fas fa-search"></i> Audit</a>
+            <a href="#" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Exceptions</a>
+            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+        </div>
+        <div class="nav-user">
+            <span class="user-name">Demo User</span>
+            <i class="fas fa-user-circle user-avatar"></i>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Header with Date Range -->
+        <div class="dashboard-header">
+            <div>
+                <h1 class="page-title">Audit Dashboard</h1>
+                <p class="page-subtitle">Real-time freight audit intelligence</p>
+            </div>
+            <div class="date-range">
+                <i class="fas fa-calendar"></i>
+                <span id="dateRangeText">Last 30 Days</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- KPI Cards Grid -->
+        <div class="kpi-grid" id="kpiContainer">
+            <!-- Dynamically populated by JS -->
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Exception Trends</h3>
+                    <select class="chart-filter" id="trendPeriod">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+                <canvas id="trendChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Exceptions by Type</h3>
+                    <select class="chart-filter" id="typeChartFilter">
+                        <option value="count">Count</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </div>
+                <canvas id="typeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Exception Heat Map -->
+        <div class="heatmap-card">
+            <div class="heatmap-header">
+                <h2><i class="fas fa-fire"></i> Exception Heat Map by Shipping Lane</h2>
+                <div class="heatmap-legend">
+                    <span><span class="legend-color low"></span> Low</span>
+                    <span><span class="legend-color medium"></span> Medium</span>
+                    <span><span class="legend-color high"></span> High</span>
+                </div>
+            </div>
+            <div class="heatmap-grid" id="heatmapContainer">
+                <!-- Dynamically populated by JS -->
+                <div class="loading-spinner">Loading heatmap data...</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-card">
+            <div class="filters-header">
+                <h3><i class="fas fa-filter"></i> Filter Exceptions</h3>
+                <button class="btn-reset" id="resetFilters">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Exception Type</label>
+                    <select id="filterType" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="weight_discrepancy">Weight Discrepancy</option>
+                        <option value="late_delivery">Late Delivery</option>
+                        <option value="rate_abuse">Rate Abuse</option>
+                        <option value="duplicate_invoice">Duplicate Invoice</option>
+                        <option value="fuel_surcharge_error">Fuel Surcharge Error</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Severity</label>
+                    <select id="filterSeverity" class="filter-select">
+                        <option value="all">All Severities</option>
+                        <option value="high">High (8-10)</option>
+                        <option value="medium">Medium (4-7)</option>
+                        <option value="low">Low (1-3)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="new">New</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="disputed">Disputed</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="filter-group slider-group">
+                    <label>Minimum Savings: <span id="savingsValue">$0</span></label>
+                    <input type="range" id="savingsSlider" min="0" max="500" value="0" step="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Exceptions Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Audit Exceptions</h3>
+                <div class="table-actions">
+                    <span class="exception-count" id="exceptionCount">Loading...</span>
+                    <button class="btn-export" id="exportBtn">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="exceptionsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="tracking">Tracking # <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="lane">Lane <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="type">Exception Type <i class="fas fa-sort"></i></th>
+                            <th>Details</th>
+                            <th class="sortable" data-sort="severity">Severity <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="savings">Potential Savings <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="status">Status <i class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="8" class="loading-row">
+                                <div class="loading-spinner">Loading exceptions...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div class="pagination-info" id="paginationInfo"></div>
+                <div class="pagination">
+                    <button class="page-btn" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                    <span class="page-numbers" id="pageNumbers"></span>
+                    <button class="page-btn" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exception Detail Modal -->
+    <div class="modal" id="exceptionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Exception Details</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeModal">Close</button>
+                <button class="btn-primary" id="disputeException">Mark as Disputed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Custom JavaScript -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

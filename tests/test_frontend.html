@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Tests</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .test-pass { background: #d4edda; color: #155724; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .test-fail { background: #f8d7da; color: #721c24; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .test-info { background: #d1ecf1; color: #0c5460; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; }
+        button { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
+    
+    <!-- Load dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Load our dashboard JS -->
+    <script src="../js/dashboard.js"></script>
+</head>
+<body>
+    <h1>🎨 SmartShip Frontend Tests</h1>
+    
+    <div class="test-section">
+        <h2>🔍 Test 1: jQuery Loaded</h2>
+        <div id="test1"></div>
+        <script>
+            if (typeof jQuery !== 'undefined') {
+                $('#test1').html('<div class="test-pass">✅ jQuery loaded (version: ' + jQuery.fn.jquery + ')</div>');
+            } else {
+                $('#test1').html('<div class="test-fail">❌ jQuery not loaded</div>');
+            }
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test 2: Chart.js Loaded</h2>
+        <div id="test2"></div>
+        <canvas id="testChart" width="400" height="200" style="display: none;"></canvas>
+        <script>
+            if (typeof Chart !== 'undefined') {
+                $('#test2').html('<div class="test-pass">✅ Chart.js loaded (version: ' + Chart.version + ')</div>');
+                
+                // Try to create a chart
+                try {
+                    const ctx = document.getElementById('testChart').getContext('2d');
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: ['Test'], datasets: [{ data: [5] }] }
+                    });
+                    $('#test2').append('<div class="test-pass">✅ Chart creation successful</div>');
+                    chart.destroy();
+                } catch(e) {
+                    $('#test2').append('<div class="test-fail">❌ Chart creation failed: ' + e.message + '</div>');
+                }
+            } else {
+                $('#test2').html('<div class="test-fail">❌ Chart.js not loaded</div>');
+            }
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Test 3: SmartShipAPI Class</h2>
+        <div id="test3"></div>
+        <script>
+            if (typeof SmartShipAPI !== 'undefined') {
+                $('#test3').html('<div class="test-pass">✅ SmartShipAPI class defined</div>');
+                
+                const api = new SmartShipAPI();
+                
+                // Test API methods
+                if (typeof api.getDashboardData === 'function') {
+                    $('#test3').append('<div class="test-pass">✅ getDashboardData method exists</div>');
+                } else {
+                    $('#test3').append('<div class="test-fail">❌ getDashboardData method missing</div>');
+                }
+                
+                // Test base URL
+                $('#test3').append('<div class="test-info">Base URL: ' + api.baseUrl + '</div>');
+            } else {
+                $('#test3').html('<div class="test-fail">❌ SmartShipAPI class not defined</div>');
+            }
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>🌐 Test 4: API Connection</h2>
+        <div id="test4"></div>
+        <button onclick="testAPIConnection()">Test API Connection</button>
+        <script>
+            function testAPIConnection() {
+                $('#test4').html('<div class="test-info">Testing API connection...</div>');
+                
+                const api = new SmartShipAPI();
+                const testUrl = api.baseUrl + '/test.php';
+                
+                $.ajax({
+                    url: testUrl,
+                    method: 'GET',
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function(data) {
+                        $('#test4').html('<div class="test-pass">✅ API connected successfully</div>');
+                        $('#test4').append('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#test4').html('<div class="test-fail">❌ API connection failed</div>');
+                        $('#test4').append('<div>URL: ' + testUrl + '</div>');
+                        $('#test4').append('<div>Status: ' + status + '</div>');
+                        $('#test4').append('<div>Error: ' + error + '</div>');
+                    }
+                });
+            }
+            
+            // Auto-run on load
+            setTimeout(testAPIConnection, 500);
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test 5: Dashboard Data</h2>
+        <div id="test5"></div>
+        <button onclick="testDashboardData()">Load Dashboard Data</button>
+        <script>
+            function testDashboardData() {
+                $('#test5').html('<div class="test-info">Loading dashboard data...</div>');
+                
+                const api = new SmartShipAPI();
+                
+                api.getDashboardData().then(data => {
+                    $('#test5').html('<div class="test-pass">✅ Dashboard data loaded</div>');
+                    
+                    // Validate structure
+                    const checks = [
+                        { key: 'metrics', name: 'Metrics' },
+                        { key: 'lanes', name: 'Lanes' },
+                        { key: 'charts', name: 'Charts' },
+                        { key: 'exceptions', name: 'Exceptions' }
+                    ];
+                    
+                    checks.forEach(check => {
+                        if (data[check.key]) {
+                            $('#test5').append('<div class="test-pass">✓ ' + check.name + ' present</div>');
+                        } else {
+                            $('#test5').append('<div class="test-fail">✗ ' + check.name + ' missing</div>');
+                        }
+                    });
+                    
+                    if (data.exceptions && data.exceptions.length > 0) {
+                        $('#test5').append('<div class="test-info">Found ' + data.exceptions.length + ' exceptions</div>');
+                        $('#test5').append('<div class="test-info">Sample: ' + JSON.stringify(data.exceptions[0]) + '</div>');
+                    }
+                    
+                }).catch(error => {
+                    $('#test5').html('<div class="test-fail">❌ Failed to load data: ' + error.message + '</div>');
+                });
+            }
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎯 Test 6: SmartShipDashboard Class</h2>
+        <div id="test6"></div>
+        <button onclick="testDashboardClass()" style="margin-bottom: 10px;">Test Dashboard Class</button>
+        <div id="dashboardTestResult"></div>
+        <script>
+            function testDashboardClass() {
+                $('#dashboardTestResult').html('<div class="test-info">Testing dashboard initialization...</div>');
+                
+                try {
+                    // Check if class exists
+                    if (typeof SmartShipDashboard !== 'undefined') {
+                        $('#dashboardTestResult').append('<div class="test-pass">✅ SmartShipDashboard class defined</div>');
+                        
+                        // Test method existence
+                        const methods = [
+                            'init', 'loadData', 'renderDashboard', 'renderKPIs',
+                            'renderHeatmap', 'renderTrendChart', 'renderTypeChart',
+                            'renderExceptionsTable', 'showExceptionDetails'
+                        ];
+                        
+                        const dashboard = new SmartShipDashboard();
+                        
+                        methods.forEach(method => {
+                            if (typeof dashboard[method] === 'function') {
+                                $('#dashboardTestResult').append('<div class="test-pass">✓ Method ' + method + ' exists</div>');
+                            } else {
+                                $('#dashboardTestResult').append('<div class="test-fail">✗ Method ' + method + ' missing</div>');
+                            }
+                        });
+                        
+                    } else {
+                        $('#dashboardTestResult').html('<div class="test-fail">❌ SmartShipDashboard class not defined</div>');
+                    }
+                } catch (error) {
+                    $('#dashboardTestResult').html('<div class="test-fail">❌ Error: ' + error.message + '</div>');
+                }
+            }
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Test 7: Helper Functions</h2>
+        <div id="test7"></div>
+        <script>
+            (function() {
+                const dashboard = new SmartShipDashboard();
+                
+                const tests = [
+                    { name: 'formatNumber(1234.56)', fn: () => dashboard.formatNumber(1234.56), expected: '1,234.56' },
+                    { name: 'formatExceptionType("weight_discrepancy")', fn: () => dashboard.formatExceptionType('weight_discrepancy'), expected: 'Weight Discrepancy' },
+                    { name: 'capitalize("test")', fn: () => dashboard.capitalize('test'), expected: 'Test' },
+                    { name: 'truncate("long text", 4)', fn: () => dashboard.truncate('long text', 4), expected: 'long...' },
+                    { name: 'getSeverityColor(9)', fn: () => dashboard.getSeverityColor(9), expected: '#ef4444' },
+                    { name: 'getSeverityColor(5)', fn: () => dashboard.getSeverityColor(5), expected: '#f59e0b' },
+                    { name: 'getSeverityColor(2)', fn: () => dashboard.getSeverityColor(2), expected: '#10b981' }
+                ];
+                
+                tests.forEach(test => {
+                    try {
+                        const result = test.fn();
+                        if (result === test.expected || 
+                            (test.name.includes('getSeverityColor') && test.expected === result)) {
+                            $('#test7').append('<div class="test-pass">✅ ' + test.name + ' = ' + result + '</div>');
+                        } else {
+                            $('#test7').append('<div class="test-fail">❌ ' + test.name + ' expected ' + test.expected + ' but got ' + result + '</div>');
+                        }
+                    } catch (e) {
+                        $('#test7').append('<div class="test-fail">❌ ' + test.name + ' threw error: ' + e.message + '</div>');
+                    }
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>
