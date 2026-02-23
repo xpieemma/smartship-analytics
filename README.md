@@ -264,7 +264,8 @@ Chart.js team for amazing visualization library
 Font Awesome for beautiful icons
 
 📧 Contact
-Your Name - @yourtwitter - email@example.com
+github.com/xpieemma
+Linkedin.com/in/epierr14
 
 Project Link: https://github.com/yourusername/smartship-analytics
 
