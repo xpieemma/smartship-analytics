@@ -4,6 +4,8 @@ An intelligent freight audit and business intelligence dashboard that automatica
 
 ![Dashboard Preview](https://xpieemma.github.io/smartship-analytics/)
 
+Live (https://xpieemma.github.io/smartship-analytics/)
+
 ## 📋 Table of Contents
 - [Overview](#overview)
 - [Features](#features)
