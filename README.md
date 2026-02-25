@@ -4,7 +4,7 @@ An intelligent freight audit and business intelligence dashboard that automatica
 
 [Dashboard Preview](https://xpieemma.github.io/smartship-analytics/)
 
-[Live] (https://xpieemma.github.io/smartship-analytics/)
+
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -28,6 +28,8 @@ SmartShip Analytics is a full-stack web application that helps logistics compani
 **The Problem:** Freight carriers overbill 10-20% of the time through weight discrepancies, rate abuses, and hidden fees. Manual auditing is slow and misses many errors.
 
 **The Solution:** Automated exception detection with real-time dashboards that highlight potential savings and problem areas.
+
+[Live](https://xpieemma.github.io/smartship-analytics/)
 
 ## ✨ Features
 
