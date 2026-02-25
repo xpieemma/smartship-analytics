@@ -2,9 +2,9 @@
 
 An intelligent freight audit and business intelligence dashboard that automatically detects shipping overcharges, late deliveries, and billing errors.
 
-![Dashboard Preview](https://xpieemma.github.io/smartship-analytics/)
+[Dashboard Preview](https://xpieemma.github.io/smartship-analytics/)
 
-Live (https://xpieemma.github.io/smartship-analytics/)
+[Live] (https://xpieemma.github.io/smartship-analytics/)
 
 ## 📋 Table of Contents
 - [Overview](#overview)
